@@ -7,7 +7,7 @@ import numpy as np
 IND_SIZE=5
 
 cities = [complex(random.randint(1,10),random.randint(1,10)) for i in range(IND_SIZE)]
-print(cities)
+print(cities, "\n")
 cities=np.array(cities)
 
 # Fitness (-0.1 para minimizar)
@@ -36,6 +36,12 @@ toolbox.register("mutate", tools.mutShuffleIndexes, indpb=0.1)
 toolbox.register("select", tools.selTournament, tournsize=3)
 toolbox.register("evaluate", evaluate)
 
+
+hof = tools.HallOfFame(1)
+stats = tools.Statistics(key=lambda ind: ind.fitness.values)
+stats.register("FB", np.min)
+stats.register("A", np.mean)
+
 def main(pop):
     
     CXPB, MUTPB, NGEN = 0.5, 0.2, 40
@@ -46,6 +52,7 @@ def main(pop):
         ind.fitness.values = fit
 
     for g in range(NGEN):
+        
         # Select the next generation individuals
         offspring = toolbox.select(pop, len(pop))
         # Clone the selected individuals
@@ -72,19 +79,27 @@ def main(pop):
 
         # The population is entirely replaced by the offspring
         pop = offspring
-
+        
+        hof.update(pop)
+        print("Gen", g+1 )
+        print("\tBest Individual:", hof[0])
+        record = stats.compile(pop)
+        print("\tFitness of Best:", record["FB"])
+        print("\tAverage Fitness:", record["A"])
+        
     return pop
 
 pop = toolbox.population(n=10)
 
-for k, i in enumerate(pop):
-
-    print("Ind:",k, "->", i, "->", toolbox.evaluate(i))
-    
+hof.update(pop)
+print("Gen 0 - Initial Population")
+print("\tBest Individual:", hof[0])
+print("\tFitness of Best:", toolbox.evaluate(hof[0])[0])
+   
 result = main(pop)
 
-print("-------------------------------")
+print("-------------------------------\n")
 
-for k, i in enumerate(result):
-    
-    print("Ind:",k, "->", i, "->", toolbox.evaluate(i))
+hof.update(pop)
+print("Best Individual:", hof[0], "---> Fitness =", hof[0].fitness.values[0],"\n" )
+
