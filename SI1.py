@@ -1,6 +1,7 @@
 import random
 import numpy
 import matplotlib.pyplot as plt
+
 from deap import base, creator, tools
 
 creator.create("FitnessMin", base.Fitness, weights=(-1.0,))
@@ -12,11 +13,16 @@ IND_SIZE=10# tamaño del individuo.
 plt.figure()
 x=0
 y=0
+
 for g in range(IND_SIZE):
-    x=random.randint(1,100)
-    y=random.randint(1,100)
+    x=random.randint(1,40)
+    y=random.randint(1,40)
     ciudades.append(complex(x,y))
+    plt.subplot(2,2,1)
     plt.plot(x,y,'bo')
+    plt.annotate('Ciudad {0}'.format(g),xy=(x,y))
+    plt.subplot(2,2,2)
+    plt.plot(x,y,'bo')    
     plt.annotate('Ciudad {0}'.format(g),xy=(x,y))
 
 for z in range(IND_SIZE):
@@ -92,9 +98,26 @@ for k, i in enumerate(pop):
     print("Ind:",k, "->", i, " Distancia= ",evaluate(i))
     
 result = main(pop)
-
+mejor=0
+primero=0
+segundo=0
 print("-------------------------------")
 for k, i in enumerate(result):
-    print("Ind:",k, "->", i, " Distancia= ",evaluate(i))
+    if(k==0):
+        mejor=i
+        primero=evaluate(i)
+        print("Ind:",k, "->", i, " Distancia= ",primero)
+    else:
+        segundo=evaluate(i)
+        if(primero>segundo):
+            primero=segundo
+            mejor=i
+        print("Ind:",k, "->", i, " Distancia= ",segundo)
+    
 
+length=len(mejor)
+l=1
+print(mejor)
+for l in range(length):
+    plt.plot((ciudades[mejor[l-1]].real,ciudades[mejor[l-1]].imag),(ciudades[mejor[l-1]].real,ciudades[mejor[l-1]].imag))
 plt.show()
